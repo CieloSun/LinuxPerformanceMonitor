@@ -4,8 +4,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 public class PerformanceData {
@@ -21,7 +19,7 @@ public class PerformanceData {
     @Column
     private float NetUsage;
     @Column
-    private LocalDateTime time;
+    private long time;
 
     public PerformanceData() {
     }
@@ -74,11 +72,11 @@ public class PerformanceData {
         NetUsage = netUsage;
     }
 
-    public LocalDateTime getTime() {
+    public long getTime() {
         return time;
     }
 
-    public void setTime(LocalDateTime time) {
+    public void setTime(long time) {
         this.time = time;
     }
 }

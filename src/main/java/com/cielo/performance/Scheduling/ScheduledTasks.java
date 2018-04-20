@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ScheduledTasks {
     @Scheduled(fixedRate = 5000)
-    public void recordData(){
+    public void recordData() {
 
     }
 }
