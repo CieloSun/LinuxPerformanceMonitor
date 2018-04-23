@@ -87,5 +87,22 @@ public class PerformanceService {
         return memoryUsage;
     }
 
+    public float getIOUsage() throws IOException{
+        float ioUsage=-1;
+        Process process=Runtime.getRuntime().exec("iostat -dx");
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line;
+        for(int i=0;(line=bufferedReader.readLine())!=null;++i){
+            //从第四行开始读
+            if(i>=4){
+                String[] temp=line.split("\\s+");
+                if(temp.length>1){
+                    float util=Float.parseFloat(temp[temp.length-1]);
+                    ioUsage=(ioUsage>util)?ioUsage:util;
+                }
+            }
+        }
+    }
+
 
 }
