@@ -1,11 +1,21 @@
+
 spring:
     datasource:
-        driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-        password: 123456
-        url: jdbc:sqlserver://ecs.cielosun.info;databaseName=SpringBootTestDB
-        username: sa
+        password: hahaschool
+        url: jdbc:mysql://localhost:3306/cielo?charset=utf8mb4&serverTimezone=UTC
+        username: root
+        driver-class-name: com.mysql.jdbc.Driver
     jpa:
         hibernate:
             ddl-auto: update
             dialect: org.hibernate.dialect.SQLServer2012Dialect
         show-sql: true
+server:
+  port: 46000
+swagger:
+  title: LinuxPerformanceMonitor
+  description: The api doc for linux performance monitor
+  contact:
+    name: Cielo
+    email: cielosun@outlook.com
+    url: http://www.cnblogs.com/cielosun

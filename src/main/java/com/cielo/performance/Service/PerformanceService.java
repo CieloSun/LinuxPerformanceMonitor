@@ -12,7 +12,7 @@ import java.io.*;
 
 @Service
 public class PerformanceService {
-    private final static int INTERVAL_TIME = 100;
+    private final static int INTERVAL_TIME = 1000;
     private final static int TotalBandwidth = 300;
     private final Log log = LogFactory.getLog(PerformanceService.class);
 
@@ -155,7 +155,7 @@ public class PerformanceService {
         bufferedReader1.close();
         process1.destroy();
         try {
-            Thread.sleep(1000);
+            Thread.sleep(INTERVAL_TIME);
         } catch (InterruptedException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
@@ -199,4 +199,6 @@ public class PerformanceService {
         performanceDataRepository.save(performanceData);
         return performanceData;
     }
+
+
 }
