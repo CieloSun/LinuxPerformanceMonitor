@@ -1,6 +1,7 @@
 package com.cielo.performance.Service;
 
 import Utils.GenericPair;
+import com.cielo.performance.Domain.PerformanceData;
 import com.cielo.performance.Domain.PerformanceDataRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -12,7 +13,7 @@ import java.io.*;
 @Service
 public class PerformanceService {
     private final static int INTERVAL_TIME = 100;
-    private final static int TotalBandwidth = 1000;
+    private final static int TotalBandwidth = 300;
     private final Log log = LogFactory.getLog(PerformanceService.class);
 
     @Autowired
@@ -94,7 +95,7 @@ public class PerformanceService {
         String line;
         for (int i = 0; (line = bufferedReader.readLine()) != null; ++i) {
             //从第四行开始读
-            if (i >= 4) {
+            if (i >= 3) {
                 String[] temp = line.split("\\s+");
                 if (temp.length > 1) {
                     float util = Float.parseFloat(temp[temp.length - 1]);
@@ -115,7 +116,7 @@ public class PerformanceService {
         String line;
         for (int i = 0; (line = bufferedReader.readLine()) != null; ++i) {
             //从第四行开始读
-            if (i >= 4) {
+            if (i >= 3) {
                 String[] temp = line.split("\\s+");
                 if (temp.length > 1) {
                     float idle = Float.parseFloat(temp[temp.length - 1]);
@@ -145,11 +146,9 @@ public class PerformanceService {
             line = line.trim();
             if(line.startsWith("ens33")||line.startsWith("eth0")){
                 String[] temp = line.split("\\s+");
-//                for(String info:temp){
-//                    log.info(info);
-//                }
-                inSize1 = Long.parseLong(temp[0].substring(5)); //Receive bytes,单位为Byte
-                outSize1 = Long.parseLong(temp[8]);             //Transmit bytes,单位为Byte
+                inSize1 = Long.parseLong(temp[1]); //Receive bytes,单位为Byte
+                outSize1 = Long.parseLong(temp[9]);//Transmit bytes,单位为Byte
+//                log.info("receive:"+inSize1+"transmit:"+outSize1);
                 break;
             }
         }
@@ -170,15 +169,17 @@ public class PerformanceService {
             line = line.trim();
             if(line.startsWith("ens33")||line.startsWith("eth0")){
                 String[] temp = line.split("\\s+");
-                inSize2 = Long.parseLong(temp[0].substring(5));
-                outSize2 = Long.parseLong(temp[8]);
+                inSize2 = Long.parseLong(temp[1]);
+                outSize2 = Long.parseLong(temp[9]);
+//                log.info("receive:"+inSize2+"transmit:"+outSize2);
                 break;
             }
         }
         if(inSize1 != 0 && outSize1 !=0 && inSize2 != 0 && outSize2 !=0){
+            //
             float interval = (float)(endTime - startTime)/1000;
             //网口传输速度,单位为bps
-            float curRate = (float)(inSize2 - inSize1 + outSize2 - outSize1)*8/(1000000*interval);
+            float curRate = (float)(inSize2 - inSize1 + outSize2 - outSize1)*8/interval;
             netUsage = curRate/TotalBandwidth;
         }
         bufferedReader2.close();
@@ -188,9 +189,14 @@ public class PerformanceService {
 
     public void printAll() throws Exception{
         log.info("CPU usage:"+getCpuUsage());
-        log.info("CPU usage:"+getCpuUsageBak());
         log.info("MEM usage:"+getMemoryUsage());
         log.info("IO usage:"+getIOUsage());
         log.info("Net usage:"+getNetUsage());
+    }
+
+    public PerformanceData getPerformanceData() throws IOException{
+        PerformanceData performanceData = new PerformanceData(getCpuUsage(), getMemoryUsage(), getIOUsage(), getNetUsage());
+        performanceDataRepository.save(performanceData);
+        return performanceData;
     }
 }

@@ -22,14 +22,15 @@ public class PerformanceData {
     private long time;
 
     public PerformanceData() {
+        time = System.currentTimeMillis();
     }
 
     public PerformanceData(float cpuUsage, float memoryUsage, float IOUsage, float netUsage) {
-
         this.cpuUsage = cpuUsage;
         this.memoryUsage = memoryUsage;
         this.IOUsage = IOUsage;
         NetUsage = netUsage;
+        time = System.currentTimeMillis();
     }
 
     public int getId() {
