@@ -109,6 +109,7 @@ select{
 .txt{
 	vertical-align: middle;
 	min-width: 60px;
+	max-width: 150px;
 	min-height: 32px;
 	border: 1px solid #d7d7d7;
 	border-radius: 5px;
