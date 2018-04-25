@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Echart图表测试</title>
+	<link rel="stylesheet" type="text/css" href="CSS/init.css">
+	<link rel="stylesheet" type="text/css" href="CSS/jquery.datetimepicker.css">
+</head>
+<body>
+	<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+	<div class="head">
+		<span>Linux性能实时监控显示系统</span>
+	</div>
+	<div class="content">
+		<div class="head-nav">
+			<div style="float: left;">
+				<span class="active" value="11"><a href="javascript:void(0);">实时数据</a></span>
+				<span value="22" class="hide-btn"><a href="javascript:void(0);">静态数据</a></span>
+			</div>
+          <!--   <span><input type="txt" name="url" placeholder="请求的URL地址"></span> -->
+			<div class="date-pick" style="display: none; float: right;">
+				<select id="items" class="txt" >
+					<option value="default" selected="selected">--请选择--</option>
+					<option value="cpu">cpu</option>
+					<option value="memory">memory</option>
+					<option value="disk">disc usage</option>
+					<option value="network">network packets</option>
+				</select>
+				起始时间：<input type="text" id="start-cal" class="txt" placeholder="请选择日期">
+				截止时间：<input type="text" id="end-cal" class="txt" placeholder="请选择日期">
+			</div>
+		</div>
+		<div class="content-left">
+			<ul>
+				<a href="javascript:void(0);" onclick="refreshChart('c');" value="c"><li class="lines">CPU</li></a>
+				<a href="javascript:void(0);" onclick="refreshChart('m');" value="m"><li class="lines">memory utilization</li></a>
+				<a href="javascript:void(0);" onclick="refreshChart('d');" value="d"><li class="lines">disc usage</li></a>
+				<a href="javascript:void(0);" onclick="refreshChart('n');" value="n" ><li class="lines">network packets</li></a>
+                <a href="javascript:void(0);"><li>敬请期待</li></a>
+			</ul>
+		</div>
+		<div class="content-right">
+			<div id="main" style="width: 600px;height:400px;"></div>
+			<div id="static" style="width: 600px;height:400px; display: none;" ></div>
+		</div>
+	</div>
+	<div class="footer">
+		<span>&copy;2018 版权归属于Lyf & sby </span>
+	</div>
+</body>
+<script type="text/javascript" src="JS/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="JS/echarts.min.js"></script>
+<script type="text/javascript" src="JS/jquery.datetimepicker.full.js"></script>
+<script>
+    $(function(){
+    	$('#start-cal').datetimepicker({lang:'ch',dateFormat:'yy-mm-dd',showSecond: true});
+    	$("#end-cal").datetimepicker({lang:'ch',dateFormat:'yy-mm-dd'});
+    });
+</script>
+<script type="text/javascript">
+		// 鼠标hover事件
+		$('.head-nav').find('span').each(function(){
+			$(this).hover(function(){
+				if(!$(this).hasClass('active')){
+					$(this).toggleClass("active");
+					$(this).siblings().toggleClass("active");
+				}
+				if($(this).hasClass('hide-btn')){
+					$('.date-pick').css('display','block');
+					$('#main').css('display','none');
+					$('#static').css('display','block');
+				}
+				else{
+					$('.date-pick').css('display','none');
+					$('#main').css('display','block');
+					$('#static').css('display','none');
+				}
+			});
+		});
+
+        //鼠标左侧导航点击选中样式事件
+        $('ul').find('a').each(function(){
+           $(this).click(function(){
+                if(!$(this).children('li').hasClass('active1')){
+                    $(this).children('li').addClass("active1");
+                    $(this).siblings().each(function(){
+                        $(this).children('li').removeClass('active1');
+                    });
+                }
+           });
+        });
+
+        // 初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+        // 初始化静态echarts实例
+        var myStaticChart = echarts.init(document.getElementById('static'));
+        // 指定图表的配置项和数据
+        var option = {
+        	title: {
+        		text: 'Linux性能实时监控',
+        		subtext: '数据采集来源于实时数据',
+        		x: 'center'
+        	},
+        	tooltip: {
+        		trigger: 'axis',
+        		axisPointer: {
+        			animation: false
+        		}
+        	},
+        	legend: {
+        		data:[],
+        		x: 'left'
+        	},
+        	xAxis: {
+        		name: '时间',
+        		type: 'category',
+        		boundaryGap: false,
+        		data: []
+        	},
+        	yAxis: {
+        		name: '状态百分比(%)',
+        		boundaryGap: [0, '60%'],
+        		type: 'value'
+        	},
+        	series: [{
+        		name: '',
+        		type: 'line',
+        		smooth: true,
+        		symbol: 'none',
+        		stack: 'a',
+        		areaStyle: {
+        			normal: {}
+        		},
+        		data: []
+        	}]
+        };
+
+        //Unix时间戳转换
+        function changeUnixTime(time){
+        	var time = new Date(time);
+        	var newTime = " ";
+        	newTime += time.getFullYear() + "/";
+        	newTime += (time.getMonth()+1) + "/";
+        	newTime += time.getDate();
+        	newTime += " " + time.getHours() + ":";
+        	newTime += time.getMinutes() + ":";
+        	newTime += time.getSeconds();
+        	return newTime;
+        }
+
+        //百分数转换
+        function percentageFormat(value){
+        	return value*100;
+        }
+
+        // 绘制图表
+        function drawCharts(datas,type){
+        	//数据加载前提示
+        	myChart.showLoading();
+        	// console.log(type);
+        	// console.log(datas.value);
+        	switch(type){
+        		case('n'):
+        		option.legend['data'] = ['network packets'];
+        		option.series[0]['name'] = 'network packets';
+        		break;
+        		case('m'):
+        		option.legend['data'] = ['memory utilization'];
+        		option.series[0]['name'] = 'memory utilization';
+        		break;
+        		case('d'):
+        		option.legend['data'] = ['disc usage'];
+        		option.series[0]['name'] = 'disc usage';
+        		break;
+        		default:
+        		option.legend['data'] = ['CPU'];
+        		option.series[0]['name'] = 'CPU';
+        		break;
+        	}
+            //读取横坐标值
+            option.xAxis['data'].push(changeUnixTime(datas.time));
+            // 读取纵坐标的值
+            option.series[0]['data'].push(percentageFormat(datas.value));
+			// console.log(datas.value);
+            // 为echarts对象加载数据
+            myChart.setOption(option,true);
+            // 关闭加载提示
+            myChart.hideLoading();
+        }
+
+        var intervalTime = 2000;
+        var timer;
+        // 图表更新
+        function refreshChart(type){
+        	var getUrl = "http://scut3362.cielosun.info:47000/cpu ";
+        	switch(type){
+        		case('n'):
+        		getUrl = getUrl = "http://scut3362.cielosun.info:47000/net";
+        		break;
+        		case('m'):
+        		getUrl = getUrl = "http://scut3362.cielosun.info:47000/memory";
+        		break;
+        		case('d'):
+        		getUrl = getUrl = "http://scut3362.cielosun.info:47000/io";
+        		break;
+        		default:
+        		getUrl = "http://scut3362.cielosun.info:47000/cpu";
+        		break;
+        	}
+        	$.ajax({
+        		type : "get",
+        		// url : "doTest.php",
+        		// url : "http://scut3362.cielosun.info:46000/cpu",
+        		url : getUrl,
+        		// data : {"types" : type},
+        		dataType : "JSON",
+        		success : function(datas){
+	        		//绘制图表
+	        		drawCharts(datas,type);
+	        		timer = setTimeout(function(){refreshChart(type);}, intervalTime);
+
+	        	},
+	        	error : function(e){
+	        		alert("请求出错了，请稍后再试！");
+	        		timer = setTimeout(function(){refreshChart(type);}, intervalTime);
+	        	}
+	        });
+        }
+
+  		//鼠标电器切换事件
+  		$('.content-left').find('ul').find('a').each(function(){
+  			$(this).click(function(){
+  				var type = $(this).attr('value');
+  				clearTimeout(timer);
+  			});
+  		});
+
+        //日期转换成时间戳
+        function changeTimeToUnix(time) {
+            var f = time.split(' ', 2);
+            var d = (f[0] ? f[0] : '').split('/', 3);
+            var t = (f[1] ? f[1] : '').split(':', 3);
+            return (new Date(
+                parseInt(d[0], 10) || null,
+                (parseInt(d[1], 10) || 1) - 1,
+                parseInt(d[2], 10) || null,
+                parseInt(t[0], 10) || null,
+                parseInt(t[1], 10) || null,
+                parseInt(t[2], 10) || null
+                )).getTime();
+        }
+
+        //静态图表绘制
+        function drawStaticCharts(datas,type){
+            console.log(type);
+            //数据加载前提示
+            myStaticChart.showLoading();
+            switch(type){
+                case('network'):
+                option.legend['data'] = ['network packets'];
+                option.series[0]['name'] = 'network packets';
+                for (var i = 0; i < datas.length ; i++ ) {
+                    // 读取纵坐标的值
+                    option.series[0]['data'].push(percentageFormat(datas[i].netUsage));
+                }
+                break;
+                case('memory'):
+                option.legend['data'] = ['memory utilization'];
+                option.series[0]['name'] = 'memory utilization';
+                for (var i = 0; i < datas.length ; i++ ) {
+                    // 读取纵坐标的值
+                    option.series[0]['data'].push(percentageFormat(datas[i].memoryUsage));
+                }
+                break;
+                case('disk'):
+                option.legend['data'] = ['disc usage'];
+                option.series[0]['name'] = 'disc usage';
+                for (var i = 0; i < datas.length ; i++ ) {
+                    // 读取纵坐标的值
+                    option.series[0]['data'].push(percentageFormat(datas[i].iousage));
+                }
+                break;
+                default:
+                option.legend['data'] = ['CPU'];
+                option.series[0]['name'] = 'CPU';
+                for (var i = 0; i < datas.length ; i++ ) {
+                    // 读取纵坐标的值
+                    option.series[0]['data'].push(percentageFormat(datas[i].cpuUsage));
+                }
+                break;
+            }
+            for (var i = 0; i < datas.length ; i++ ) {
+                //读取横坐标值
+                option.xAxis['data'].push(changeUnixTime(datas[i].time));
+            }
+            // 为echarts对象加载数据
+            myStaticChart.setOption(option,true);
+            // 关闭加载提示
+            myStaticChart.hideLoading();
+        }
+        //静态数据的获取
+        $('#items').change(function(){
+            var selectedValue = $(this).val();
+            // var startTime = changeTimeToUnix($('#start-cal').val());
+            var startTime = changeTimeToUnix($('#start-cal').val());
+            var endTime = changeTimeToUnix($('#end-cal').val());
+            console.log(startTime);
+            if(selectedValue == 'default'){
+                alert("请选择查询类型！");
+                return;
+            }
+            if(startTime <= 0 || endTime <=0 ){
+                alert("请选择时间区间！");
+                return;
+            }
+            $.ajax({
+                type : "get",
+                url : 'http://scut3362.cielosun.info:47000/history',
+                data : {"startTime" : startTime, "endTime" : endTime},
+                dataType : "JSON",
+                success : function(datas){
+                    //绘制图表
+                    drawStaticCharts(datas, selectedValue);
+                    // console.log(datas);
+                },
+                error : function(e){
+                    alert("请求出错了，请稍后再试！");
+                }
+            });
+        });
+</script>
+</html>

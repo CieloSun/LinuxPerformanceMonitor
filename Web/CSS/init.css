@@ -1,0 +1,119 @@
+/*页面公共样式*/
+/*去除内外边距*/
+*{
+	margin : 0px;
+	padding : 0px;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-size: 18px;
+}
+a{
+	text-decoration: none;
+}
+body{
+	background: #eee;
+}
+/*头部样式*/
+.head,.footer{	
+	min-height: 100px;
+	max-height: 120px;
+	width: 100%;
+	text-align: center;
+}
+.head span,.footer span{
+	display: inline-block;
+	line-height: 100px; 
+	
+}
+.head span{
+	color: #04b4ed;
+	font-size: 32px;
+}
+/*头部导航样式*/
+.head-nav{
+	height: 60px;
+	line-height: 60px;
+	background: #e1e1e1;
+	border-radius: 5px;
+}
+.head-nav span,.head-nav span a{
+	min-width: 120px;
+	display: inline-block;
+	text-align: center;
+}
+.head-nav .active{
+	background: #c9c6c6;
+}
+.active1{
+	background: #c5b7b7;
+}
+.date-pick{
+	margin-left: 15px;
+}
+/*中部样式*/
+.content{
+	/*min-height: 500px;*/
+	width: 70%;
+	padding: 0% 15% 5% 15%;
+}
+.content-left{
+	float: left;
+	width: 20%;
+	background: #ececec;
+	border: 1.5px solid #cbc2c2;
+	border-radius: 5px;
+}
+.content-left ul{
+	height: 398px;
+	min-width: 120px;
+}
+.content-left ul li{
+	height: 80px;
+	list-style: none;
+	line-height: 80px;
+	display: block;
+	padding-left: 15px;
+}
+li:hover{
+	background: #c9c6c6;
+}
+.content-left .lines{
+	border-bottom: 2px solid #fff; 
+}
+.content-right{
+	width: 75%;
+	text-align: right;
+}
+.content-right{
+	float: right;
+}
+/*底部样式*/
+.footer{
+	clear: both;
+	/*position: fixed;
+	bottom: 0px;*/
+}
+.footer span{
+	color: #897d7d;
+	font-size: 14px;
+}
+/*输入框样式*/
+select{
+	border: none;
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	background: url("../Img/select.png") no-repeat right;
+	background-size: 14px 14px;
+	padding-right: 3px;
+}
+.txt{
+	vertical-align: middle;
+	min-width: 60px;
+	min-height: 32px;
+	border: 1px solid #d7d7d7;
+	border-radius: 5px;
+	background-color: #fff;
+	color: #595959;
+	padding-left: 6px;
+	font-size: 16px;
+}
