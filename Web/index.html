@@ -232,6 +232,9 @@
   			$(this).click(function(){
   				var type = $(this).attr('value');
   				clearTimeout(timer);
+                 //以下两行代码用于清空echart之前请求的数据
+                 option.xAxis['data'] = [];
+                 option.series[0]['data'] = [];
   			});
   		});
 
@@ -301,6 +304,7 @@
             // 关闭加载提示
             myStaticChart.hideLoading();
         }
+
         //静态数据的获取
         $('#items').change(function(){
             var selectedValue = $(this).val();
