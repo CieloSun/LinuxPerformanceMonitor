@@ -252,7 +252,10 @@
 
         //静态图表绘制
         function drawStaticCharts(datas,type){
-            console.log(type);
+            //以下两行代码用于清空echart之前请求的数据
+            option.xAxis['data'] = [];
+            option.series[0]['data'] = [];
+            // console.log(type);
             //数据加载前提示
             myStaticChart.showLoading();
             switch(type){
