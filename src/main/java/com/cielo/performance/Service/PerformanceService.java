@@ -12,8 +12,9 @@ import java.io.*;
 
 @Service
 public class PerformanceService {
-    private final static int INTERVAL_TIME = 1000;
-    private final static int TotalBandwidth = 300;
+    private final static int CPU_INTERVAL_TIME=100;
+    private final static int NET_INTERVAL_TIME = 1000;
+    private final static int TOTAL_BANDWIDTH = 300;
     private final Log log = LogFactory.getLog(PerformanceService.class);
 
     @Autowired
@@ -50,11 +51,11 @@ public class PerformanceService {
         return new GenericPair(idleCpuTime, totalCpuTime);
     }
 
-    public float getCpuUsageBak() throws IOException {
+    public float getCpuUsage() throws IOException {
         float cpuUsage = -1;
         GenericPair<Long, Long> firstPair = calculateIdleAndTotal();
         try {
-            Thread.sleep(INTERVAL_TIME);
+            Thread.sleep(CPU_INTERVAL_TIME);
         } catch (InterruptedException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
@@ -109,7 +110,7 @@ public class PerformanceService {
         return ioUsage;
     }
 
-    public float getCpuUsage() throws IOException {
+    public float getCpuUsageOld() throws IOException {
         float cpuIdle = -1;
         Process process = Runtime.getRuntime().exec("iostat -c");
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -155,7 +156,7 @@ public class PerformanceService {
         bufferedReader1.close();
         process1.destroy();
         try {
-            Thread.sleep(INTERVAL_TIME);
+            Thread.sleep(NET_INTERVAL_TIME);
         } catch (InterruptedException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
@@ -180,7 +181,7 @@ public class PerformanceService {
             float interval = (float)(endTime - startTime)/1000;
             //网口传输速度,单位为bps
             float curRate = (float)(inSize2 - inSize1 + outSize2 - outSize1)*8/interval;
-            netUsage = curRate/TotalBandwidth;
+            netUsage = curRate/TOTAL_BANDWIDTH;
         }
         bufferedReader2.close();
         process2.destroy();
@@ -188,7 +189,7 @@ public class PerformanceService {
     }
 
     public void printAll() throws Exception{
-        log.info("CPU usage:"+getCpuUsage());
+        log.info("CPU usage:"+ getCpuUsage());
         log.info("MEM usage:"+getMemoryUsage());
         log.info("IO usage:"+getIOUsage());
         log.info("Net usage:"+getNetUsage());

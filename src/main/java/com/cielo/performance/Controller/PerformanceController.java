@@ -6,7 +6,6 @@ import com.cielo.performance.Domain.PerformanceDataRepository;
 import com.cielo.performance.Service.PerformanceService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
