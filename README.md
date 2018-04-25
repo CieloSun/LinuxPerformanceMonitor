@@ -1,5 +1,5 @@
 # LinuxPerformanceMonitor
 
-* Web开发完成，只需要运行Web下的index页面即可看到效果\
-目前存在的问题是实施加载数据的时候不能清空上一次的数据导致显示有一定的问题，后期进行修复。
-Develop by Spring boot.
+* Web开发完成，只需要运行Web下的index页面即可看到效果目前存在的问题是实施加载数据的时候不能清空上一次的数据导致显示有一定的问题，后期进行修复。
+
+* Develop by Spring boot.
