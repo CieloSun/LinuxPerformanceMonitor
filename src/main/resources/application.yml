@@ -19,3 +19,5 @@ swagger:
     name: Cielo
     email: cielosun@outlook.com
     url: http://www.cnblogs.com/cielosun
+net:
+  totalBandWidth: 20

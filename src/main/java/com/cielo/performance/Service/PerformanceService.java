@@ -6,16 +6,19 @@ import com.cielo.performance.Domain.PerformanceDataRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 
 @Service
+@ConfigurationProperties(prefix = "net")
 public class PerformanceService {
-    private final static int CPU_INTERVAL_TIME=100;
-    private final static int NET_INTERVAL_TIME = 1000;
-    private final static int TOTAL_BANDWIDTH = 300;
+    private final static int CPU_INTERVAL_TIME = 100;
+    private final static int NET_INTERVAL_TIME = 100;
     private final Log log = LogFactory.getLog(PerformanceService.class);
+
+    private int totalBandWidth;
 
     @Autowired
     private PerformanceDataRepository performanceDataRepository;
@@ -134,7 +137,7 @@ public class PerformanceService {
 
     public float getNetUsage() throws IOException {
         float netUsage = -1;
-        Process process1,process2;
+        Process process1, process2;
         Runtime runtime = Runtime.getRuntime();
         String command = "cat /proc/net/dev";
         //第一次采集流量数据
@@ -143,9 +146,9 @@ public class PerformanceService {
         BufferedReader bufferedReader1 = new BufferedReader(new InputStreamReader(process1.getInputStream()));
         String line;
         long inSize1 = 0, outSize1 = 0;
-        while((line=bufferedReader1.readLine()) != null){
+        while ((line = bufferedReader1.readLine()) != null) {
             line = line.trim();
-            if(line.startsWith("ens33")||line.startsWith("eth0")){
+            if (line.startsWith("ens33") || line.startsWith("eth0")) {
                 String[] temp = line.split("\\s+");
                 inSize1 = Long.parseLong(temp[1]); //Receive bytes,单位为Byte
                 outSize1 = Long.parseLong(temp[9]);//Transmit bytes,单位为Byte
@@ -165,10 +168,10 @@ public class PerformanceService {
         long endTime = System.currentTimeMillis();
         process2 = runtime.exec(command);
         BufferedReader bufferedReader2 = new BufferedReader(new InputStreamReader(process2.getInputStream()));
-        long inSize2 = 0 ,outSize2 = 0;
-        while((line=bufferedReader2.readLine()) != null){
+        long inSize2 = 0, outSize2 = 0;
+        while ((line = bufferedReader2.readLine()) != null) {
             line = line.trim();
-            if(line.startsWith("ens33")||line.startsWith("eth0")){
+            if (line.startsWith("ens33") || line.startsWith("eth0")) {
                 String[] temp = line.split("\\s+");
                 inSize2 = Long.parseLong(temp[1]);
                 outSize2 = Long.parseLong(temp[9]);
@@ -176,26 +179,34 @@ public class PerformanceService {
                 break;
             }
         }
-        if(inSize1 != 0 && outSize1 !=0 && inSize2 != 0 && outSize2 !=0){
+        if (inSize1 != 0 && outSize1 != 0 && inSize2 != 0 && outSize2 != 0) {
             //
-            float interval = (float)(endTime - startTime)/1000;
+            float interval = (float) (endTime - startTime) / 1000;
             //网口传输速度,单位为bps
-            float curRate = (float)(inSize2 - inSize1 + outSize2 - outSize1)*8/interval;
-            netUsage = curRate/TOTAL_BANDWIDTH;
+            float curRate = (float) (inSize2 - inSize1 + outSize2 - outSize1) * 8 / (interval * 1000000);
+            netUsage = curRate / totalBandWidth;
         }
         bufferedReader2.close();
         process2.destroy();
         return netUsage;
     }
 
-    public void printAll() throws Exception{
-        log.info("CPU usage:"+ getCpuUsage());
-        log.info("MEM usage:"+getMemoryUsage());
-        log.info("IO usage:"+getIOUsage());
-        log.info("Net usage:"+getNetUsage());
+    public void printAll() throws Exception {
+        log.info("CPU usage:" + getCpuUsage());
+        log.info("MEM usage:" + getMemoryUsage());
+        log.info("IO usage:" + getIOUsage());
+        log.info("Net usage:" + getNetUsage());
     }
 
-    public PerformanceData getPerformanceData() throws IOException{
+    public int getTotalBandWidth() {
+        return totalBandWidth;
+    }
+
+    public void setTotalBandWidth(int totalBandWidth) {
+        this.totalBandWidth = totalBandWidth;
+    }
+
+    public PerformanceData getPerformanceData() throws IOException {
         PerformanceData performanceData = new PerformanceData(getCpuUsage(), getMemoryUsage(), getIOUsage(), getNetUsage());
         performanceDataRepository.save(performanceData);
         return performanceData;
