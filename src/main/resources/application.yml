@@ -10,6 +10,10 @@ spring:
             ddl-auto: update
             dialect: org.hibernate.dialect.SQLServer2012Dialect
         show-sql: true
+#    mvc:
+#      static-path-pattern: /**
+#    resources:
+#      static-locations: classpath:/templates/,classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/
 server:
   port: 46000
 swagger:

@@ -33,12 +33,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
-        <!--<dependency>-->
-        <!--<groupId>com.microsoft.sqlserver</groupId>-->
-        <!--<artifactId>mssql-jdbc</artifactId>-->
-        <!--<scope>runtime</scope>-->
-        <!--</dependency>-->
         <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
         <dependency>
             <groupId>mysql</groupId>

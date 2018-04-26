@@ -192,19 +192,19 @@
         var timer;
         // 图表更新
         function refreshChart(type){
-        	var getUrl = "http://scut3362.cielosun.info:47000/cpu ";
+        	var getUrl = "cpu ";
         	switch(type){
         		case('n'):
-        		getUrl = getUrl = "http://scut3362.cielosun.info:47000/net";
+        		getUrl = getUrl = "net";
         		break;
         		case('m'):
-        		getUrl = getUrl = "http://scut3362.cielosun.info:47000/memory";
+        		getUrl = getUrl = "memory";
         		break;
         		case('d'):
-        		getUrl = getUrl = "http://scut3362.cielosun.info:47000/io";
+        		getUrl = getUrl = "io";
         		break;
         		default:
-        		getUrl = "http://scut3362.cielosun.info:47000/cpu";
+        		getUrl = "cpu";
         		break;
         	}
         	$.ajax({
@@ -322,7 +322,7 @@
             }
             $.ajax({
                 type : "get",
-                url : 'http://scut3362.cielosun.info:47000/history',
+                url : 'history',
                 data : {"startTime" : startTime, "endTime" : endTime},
                 dataType : "JSON",
                 success : function(datas){
