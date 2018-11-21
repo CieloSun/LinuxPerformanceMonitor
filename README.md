@@ -1,9 +1,5 @@
 # LinuxPerformanceMonitor
 
-## 效果查询
-
-- [点击进入](http://frp.cielosun.info:47000/)
-
 ## 开发工具
 
 - Develop by Spring boot + Echart
